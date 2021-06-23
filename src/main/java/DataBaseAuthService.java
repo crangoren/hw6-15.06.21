@@ -8,7 +8,7 @@ public class DataBaseAuthService implements AuthService{
     private static Statement stmt;
     private static PreparedStatement prst;
 
-    private static final Logger logger = Logger.getLogger(BaseAuthService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MyServer.class.getName());
 
 
     @Override
@@ -28,7 +28,7 @@ public class DataBaseAuthService implements AuthService{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
         }
         return null;
     }
@@ -37,11 +37,11 @@ public class DataBaseAuthService implements AuthService{
     public boolean registerNewUser(String login, String password, String nickname) {
         try {
             stmt.executeUpdate(String.format("INSERT INTO auth (login, psw, nickname) VALUES ('%s', '%s', '%s');", login, password, nickname));
-            logger.info("Зарегистрирован новый пользователь: " + nickname);
+            LOGGER.info("Зарегистрирован новый клиент: " + nickname);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             return false;
         }
     }
@@ -49,11 +49,11 @@ public class DataBaseAuthService implements AuthService{
     public boolean changeNickname (String oldNickname, String newNickname) {
         try {
             stmt.executeUpdate(String.format("UPDATE auth SET nickname='%s' WHERE nickname='%s';", newNickname, oldNickname));
-            logger.info("Пользователь " + oldNickname + " изменил никнейм на " + newNickname);
+            LOGGER.info("Клиент " + oldNickname + " изменил никнейм на " + newNickname);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             return false;
         }
     }
@@ -65,7 +65,7 @@ public class DataBaseAuthService implements AuthService{
             stmt = connection.createStatement();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
         }
     }
 
@@ -88,7 +88,7 @@ public class DataBaseAuthService implements AuthService{
 
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
         }
     }
 

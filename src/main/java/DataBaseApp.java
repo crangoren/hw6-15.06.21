@@ -39,7 +39,7 @@ public class DataBaseApp {
                 "login      STRING          NOT NULL UNIQUE,\n" +
                 "psw        STRING          NOT NULL,\n" +
                 "nickname   STRING          NOT NULL UNIQUE);");
-        System.out.println("Таблица 'auth' готова");
+ //       System.out.println("Таблица 'auth' готова");
     }
 
 //    public static void createHistoryDB() throws SQLException {

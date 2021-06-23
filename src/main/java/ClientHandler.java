@@ -1,4 +1,6 @@
 
+import org.apache.logging.log4j.LogManager;
+
 import java.io.*;
 import java.net.Socket;
 import java.sql.Connection;
@@ -22,11 +24,12 @@ public class ClientHandler implements Runnable{
     private static Connection connectionHistory;
     private static Statement stmt;
     private HistoryWriter historyDB = new HistoryWriter();
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(MyServer.class.getName());
 
 //    File history = new File("history.db");
 
 
-    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
+
 
 
 
@@ -56,7 +59,8 @@ public class ClientHandler implements Runnable{
 
             }).start();
         } catch (IOException ex) {
-            System.out.println("Проблема при создании клиента");
+            LOGGER.error("Проблема при создании клиента");
+//            System.out.println("Проблема при создании клиента");
         }
     }
 
@@ -84,21 +88,25 @@ public class ClientHandler implements Runnable{
                 e.printStackTrace();
             }
 //            Client.writeHistory(messageFromClient); //вызов метода записи
-
             System.out.println("от " + name + ": " + messageFromClient);
 
             assert messageFromClient != null;
             if (messageFromClient.equals(ChatConstants.STOP_WORD)) {
+                LOGGER.info("Клиент прислал команду: /end");
+
                 return;
             } else if (messageFromClient.startsWith(ChatConstants.SEND_TO_LIST)) {
+                LOGGER.info("Клиент прислал команду: /list");
                 String[] splittedStr = messageFromClient.split("\\s+");
                 List<String> nicknames = new ArrayList<>();
                 for (int i = 1; i < splittedStr.length - 1; i++) {
                     nicknames.add(splittedStr[i]);
                 }
             } else if (messageFromClient.startsWith(ChatConstants.CLIENTS_LIST)) {
+                LOGGER.info("Клиент прислал команду: /clients");
                 server.broadcastClients();
             } else if (messageFromClient.startsWith(ChatConstants.PRIVATE_MESSAGE)){
+                LOGGER.info("Клиент прислал команду: /w");
                 String[] targetMessage = messageFromClient.split("\\s+");
                 for (int i = 0; i < targetMessage.length; i++) {
                     targetMessage[i] = targetMessage[i].replaceAll("[^\\w]", "");
@@ -117,6 +125,7 @@ public class ClientHandler implements Runnable{
             } else {
 
                 server.broadcastMessage("[" + name + "]: " + messageFromClient);
+                LOGGER.info("Клиент отправил сообщение");
             }
 
         }
@@ -142,15 +151,14 @@ public class ClientHandler implements Runnable{
                         name = nick.get();
                         server.subscribe(this);
                         server.broadcastMessage(name + " вошел в чат");
-
-
+                        LOGGER.info("Клиент вошел в чат");
 //                        DataBaseApp.createHistoryDB();
-
                         return;
                     } else {
                         sendMsg("Ник уже используется");
                     }
                 } else {
+                    LOGGER.info("Введены неверные логин/пароль");
                     sendMsg("Неверные логин/пароль");
                 }
             }
@@ -170,6 +178,7 @@ public class ClientHandler implements Runnable{
 
     public void closeConnection() {
         server.unsubscribe(this);
+        LOGGER.info("Клиент покинул чат");
         server.broadcastMessage(name + " вышел из чата");
         try {
             inputStream.close();
