@@ -1,4 +1,7 @@
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import java.util.stream.Collectors;
 
 public class MyServer {
@@ -22,26 +26,32 @@ public class MyServer {
     private static Connection connectionHistory;
     private static Statement stmt;
     private HistoryWriter historyShower = new HistoryWriter();
+    private static final Logger LOGGER = LogManager.getLogger(MyServer.class.getName());
+    public static PrintWriter in;
 
 
 
 
     public MyServer() {
 
+
         try (ServerSocket server = new ServerSocket(ChatConstants.PORT)) {
             authService = new DataBaseAuthService();
             authService.start();
             clients = new ArrayList<>();
             connectionTimeout();
-
+            LOGGER.info("Сервер ожидает подключения");
             while (true) {
-                System.out.println("Сервер ожидает подключения");
+//                System.out.println("Сервер ожидает подключения");
+
                 Socket socket = server.accept();
-                System.out.println("Клиент подключился");
+//                System.out.println("Клиент подключился");
+                LOGGER.info("Клиент подключился");
                 StringBuilder historyString = null;
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
                 executorService.execute( new ClientHandler(this, socket));
                 executorService.shutdown();
+
                 try {
                     historyString = historyShower.getHistoryChat();
                 } catch (IOException e) {
@@ -51,12 +61,13 @@ public class MyServer {
                     String[] mass = historyString.toString().split("\n");
                     for (int i = 0; i < mass.length; i++) {
                         String[] partsMass = mass[i].split(" ", 2);
-                        System.out.println((partsMass[0] + partsMass[1]));
+//                        System.out.println((partsMass[0] + partsMass[1]));
                     }
                 }
 
                 //               Client.readHistory();
                 new ClientHandler(this, socket);
+
 
             }
 
@@ -130,7 +141,8 @@ public class MyServer {
                         ClientHandler client = i.next();
                         if (!client.isActive()
                                 && Duration.between(client.getConnectTime(), now).getSeconds() > ChatConstants.MAX_DELAY_TIME) {
-                            System.out.println("Тайм-аут ожидания авторизации. Соединение закрыто");
+                            LOGGER.error("Тайм-аут ожидания авторизации. Соединение закрыто");
+//                            System.out.println("Тайм-аут ожидания авторизации. Соединение закрыто");
                             client.closeConnection();
                             i.remove();
                         }

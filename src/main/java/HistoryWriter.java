@@ -1,5 +1,7 @@
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class HistoryWriter {
 
@@ -45,6 +47,8 @@ public class HistoryWriter {
         if (!file.exists()){
             return null;
         }
+        List<String> history = new LinkedList<>();
+
 
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -58,8 +62,6 @@ public class HistoryWriter {
                 br.readLine();
             }
         }
-
-
 
 
         while ((strLine = br.readLine()) != null){

@@ -14,6 +14,8 @@ public class Client {
 
     public static Connection connection;
     public static Statement stmt;
+    public static PrintWriter out;
+
 
 
 
@@ -27,7 +29,7 @@ public class Client {
         try (Socket socket = new Socket("localhost", ChatConstants.PORT)) {
 
             Scanner in = new Scanner(socket.getInputStream());
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out = new PrintWriter(socket.getOutputStream(), true);
             Scanner sc = new Scanner(System.in);
 
             System.out.println("Введите сообщение...");
